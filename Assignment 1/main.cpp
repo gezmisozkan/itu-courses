@@ -239,7 +239,7 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
     vector<pair<int,int>> largest_colonies(k); // initialize the size of the largest colony pair, first index is the size of the colony, second index is the resource type
     for(int i = 0; i < 5; i++){
         largest_colonies[i].first = 0; // initialize the size of the largest colony to 0
-        largest_colonies[i].second = i+1; // initialize the resource type of the largest colony
+        largest_colonies[i].second = 0; // initialize the resource type of the largest colony to 0
     }
 
     // iterate through the map and find the largest colonies
@@ -252,7 +252,7 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
                     size = dfs(map, i, j, k);
                 else 
                     size = bfs(map, i, j, k);
-                sort(largest_colonies.begin(), largest_colonies.end(),greater()); // sort the largest colonies in decreasing order according to their size
+                sort(largest_colonies.begin(), largest_colonies.end(),greater<pair<int, int>>()); // sort the largest colonies in decreasing order according to their size
                 if(size > largest_colonies.back().first){ // if the size of the current colony is larger than the size of the smallest colony in the vector, update the element
                     largest_colonies.pop_back(); // remove the smallest colony from the vector
                     largest_colonies.push_back(pair<int,int>(size,k)); // add the current colony to the vector
@@ -269,8 +269,8 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
     /* START YOUR CODE HERE */
 
     // Sort the largest colonies in decreasing order
-    for(int i=0; i<5; i++){
-        for(int j=i+1; j<5; j++){
+    for(int i=0; i<k; i++){
+        for(int j=i+1; j<k; j++){
             if(largest_colonies[i].first < largest_colonies[j].first){ // sort the largest colonies in decreasing order according to their size
                 auto temp = largest_colonies[i]; // swap the largest colonies
                 largest_colonies[i] = largest_colonies[j];
@@ -294,10 +294,10 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
 
 // Main function
 int main(int argc, char* argv[]) {
-    // argc = 4;
-    // argv[1] = "1";
-    // argv[2] = "5";
-    // argv[3] = "map4.txt";
+    argc = 4;
+    argv[1] = "1";
+    argv[2] = "5";
+    argv[3] = "map4.txt";
     // Check the command line arguments
     if (argc != 4) {
 
