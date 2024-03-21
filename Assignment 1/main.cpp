@@ -40,74 +40,76 @@ class Node{  // class to represent the elements of the map
     }
 };
 // function to push the neighbors of the current element to the stack and makes added nodes visited
-void push_neigbors_to_stack(int row, int col, int lenght, int height, int resource, vector<vector<int>>& map, stack <Node>& dfsStack, bool** expanded_nodes){   
-        if(row-1 >= 0 && map[row-1][col] == resource && !expanded_nodes[row-1][col]){ // top
+// if element is -1 it means it is added to the stack
+void push_neigbors_to_stack(int row, int col, int lenght, int height, int resource, vector<vector<int>>& map, stack <Node>& dfsStack){   
+        if(row-1 >= 0 && map[row-1][col] == resource && map[row-1][col]!= -1){ // top
             dfsStack.push(Node(map[row-1][col],pair<int,int>(row-1,col))); // push the element to the top of the current element to the stack
-            expanded_nodes[row-1][col] = true;
+            map[row-1][col] = -1;
         }
-        else if(row-1 < 0 && map[lenght-1][col] == resource && !expanded_nodes[lenght-1][col]){
+        else if(row-1 < 0 && map[lenght-1][col] == resource && map[lenght-1][col]!= -1){
             dfsStack.push(Node(map[lenght-1][col],pair<int,int>(lenght-1,col))); // if the current element is at the top edge of the map, push the element at the bottom edge to the stack
-            expanded_nodes[lenght-1][col] = true;
+            map[lenght-1][col] = -1;
         }
-        if(col-1 >= 0 && map[row][col-1] == resource && !expanded_nodes[row][col-1]){ // left
+        if(col-1 >= 0 && map[row][col-1] == resource && map[row][col-1]!= -1){ // left
             dfsStack.push(Node(map[row][col-1],pair<int,int>(row,col-1))); // push the element to the left of the current element to the stack
-            expanded_nodes[row][col-1] = true;
+            map[row][col-1] = -1;
         }
-        else if(col-1 < 0 && map[row][height-1] == resource && !expanded_nodes[row][height-1]){
+        else if(col-1 < 0 && map[row][height-1] == resource && map[row][height-1]!= -1){
             dfsStack.push(Node(map[row][height-1],pair<int,int>(row,height-1))); // if the current element is at the left edge of the map, push the element at the right edge to the stack
-            expanded_nodes[row][height-1] = true;
+            map[row][height-1] = -1;
         }
-        if(row+1 < lenght && map[row+1][col] == resource && !expanded_nodes[row+1][col]){ // bottom
+        if(row+1 < lenght && map[row+1][col] == resource && map[row+1][col]!= -1){ // bottom
             dfsStack.push(Node(map[row+1][col],pair<int,int>(row+1,col))); // push the element to the bottom of the current element to the stack
-            expanded_nodes[row+1][col] = true;
+            map[row+1][col] = -1;
         }
-        else if(row+1 >= lenght && map[0][col] == resource && !expanded_nodes[0][col]){
+        else if(row+1 >= lenght && map[0][col] == resource && map[0][col]!= -1){
             dfsStack.push(Node(map[0][col],pair<int,int>(0,col))); // if the current element is at the bottom edge of the map, push the element at the top edge to the stack
-            expanded_nodes[0][col] = true;
+            map[0][col] = -1;
         }
-        if(col+1 < height && map[row][col+1] == resource && !expanded_nodes[row][col+1]){ // right
+        if(col+1 < height && map[row][col+1] == resource && map[row][col+1]!= -1){ // right
             dfsStack.push(Node(map[row][col+1],pair<int,int>(row,col+1))); // push the element to the right of the current element to the stack
-            expanded_nodes[row][col+1] = true;
+            map[row][col+1] = -1;
         }
-        else if(col+1 >= height && map[row][0] == resource && !expanded_nodes[row][0]){
+        else if(col+1 >= height && map[row][0] == resource && map[row][0]!= -1){
             dfsStack.push(Node(map[row][0],pair<int,int>(row,0))); // if the current element is at the right edge of the map, push the element at the left edge to the stack
-            expanded_nodes[row][0] = true;
+            map[row][0] = -1;
         }
 }
 
 // function to push the neighbors of the current element to the queue and makes added nodes visited
-void push_neigbors_to_queue(int row, int col, int lenght, int height, int resource, vector<vector<int>>& map, queue <Node>& bfsQueue,bool** expanded_nodes){   
-        if(row-1 >= 0 && map[row-1][col] == resource && !expanded_nodes[row-1][col]){ // top
+// if element is -1 it means it is added to the queue
+void push_neigbors_to_queue(int row, int col, int lenght, int height, int resource, vector<vector<int>>& map, queue <Node>& bfsQueue){   
+        if(row-1 >= 0 && map[row-1][col] == resource && map[row-1][col]!= -1){ // top
             bfsQueue.push(Node(map[row-1][col],pair<int,int>(row-1,col))); // push the element to the top of the current element to the queue
-            expanded_nodes[row-1][col] = true;
+            map[row-1][col] = -1;
         }
-        else if(row-1 < 0 && map[lenght-1][col] == resource && !expanded_nodes[lenght-1][col]){
+        else if(row-1 < 0 && map[lenght-1][col] == resource && map[lenght-1][col]!= -1){
             bfsQueue.push(Node(map[lenght-1][col],pair<int,int>(lenght-1,col))); // if the current element is at the top edge of the map, push the element at the bottom edge to the queue
-            expanded_nodes[lenght-1][col] = true;
+            map[lenght-1][col] = -1;
         }
-        if(col-1 >= 0 && map[row][col-1] == resource && !expanded_nodes[row][col-1]){ // left
+        if(col-1 >= 0 && map[row][col-1] == resource && map[row][col-1]!= -1){ // left
             bfsQueue.push(Node(map[row][col-1],pair<int,int>(row,col-1))); // push the element to the left of the current element to the queue
-            expanded_nodes[row][col-1] = true;
+            map[row][col-1] = -1;
         }
-        else if(col-1 < 0 && map[row][height-1] == resource && !expanded_nodes[row][height-1]){
+        else if(col-1 < 0 && map[row][height-1] == resource && map[row][height-1]!= -1){
             bfsQueue.push(Node(map[row][height-1],pair<int,int>(row,height-1))); // if the current element is at the left edge of the map, push the element at the right edge to the queue
-            expanded_nodes[row][height-1] = true;
+            map[row][height-1] = -1;
         }
-        if(row+1 < lenght && map[row+1][col] == resource && !expanded_nodes[row+1][col]){ // bottom
+        if(row+1 < lenght && map[row+1][col] == resource && map[row+1][col]!= -1){ // bottom
             bfsQueue.push(Node(map[row+1][col],pair<int,int>(row+1,col))); // push the element to the bottom of the current element to the queue
-            expanded_nodes[row+1][col] = true;
+            map[row+1][col] = -1;
         }
-        else if(row+1 >= lenght && map[0][col] == resource && !expanded_nodes[0][col]){
+        else if(row+1 >= lenght && map[0][col] == resource && map[0][col]!= -1){
             bfsQueue.push(Node(map[0][col],pair<int,int>(0,col))); // if the current element is at the bottom edge of the map, push the element at the top edge to the queue
-            expanded_nodes[0][col] = true;
+            map[0][col] = -1;
         }
-        if(col+1 < height && map[row][col+1] == resource && !expanded_nodes[row][col+1]){ // right
+        if(col+1 < height && map[row][col+1] == resource && map[row][col+1]!= -1){ // right
             bfsQueue.push(Node(map[row][col+1],pair<int,int>(row,col+1))); // push the element to the right of the current element to the queue
-            expanded_nodes[row][col+1] = true;
+            map[row][col+1] = -1;
         }
-        else if(col+1 >= height && map[row][0] == resource && !expanded_nodes[row][0]){
+        else if(col+1 >= height && map[row][0] == resource && map[row][0]!= -1){
             bfsQueue.push(Node(map[row][0],pair<int,int>(row,0))); // if the current element is at the right edge of the map, push the element at the left edge to the queue
-            expanded_nodes[row][0] = true;
+            map[row][0] = -1;
         }
 }
 
@@ -133,33 +135,16 @@ int dfs(vector<vector<int>>& map, int row, int col, int resource) {
     stack <Node> dfsStack; // create a stack to keep track of the elements to be visited, each element is a pair of the resource value and the pair of the row and column index
     int height = map[0].size(); // length of the row
     int length = map.size(); // length of the column
-    bool** expanded_nodes = new bool*[length]; // create a 2D array to keep track of visited nodes
-    // Declare memory block of size length
-	for (int i = 0; i < length; i++) {
-		// Declare a memory block of size height
-		expanded_nodes[i] = new bool[height];
-	}
-    for(int i = 0; i < length; i++){ // initialize the visited nodes to false
-        for(int j = 0; j < height; j++){
-            expanded_nodes[i][j] = false;
-        }
-    }
 
-    
     dfsStack.push(Node(map[row][col],pair<int,int>(row,col))); // push the first element to the queue
-    expanded_nodes[row][col] = true; // mark the first element as visited
-
+    map[row][col] = -1; // change the value of the current element to -1 to make it visited
     while(!dfsStack.empty()){ // while the queue is not empty
         auto currentElement = dfsStack.top(); // get the first element of the stack
         dfsStack.pop(); // remove the first element from the queue
-        map[currentElement.index.first][currentElement.index.second] = -1; // change the value of the current element to -1 to find the largest colony in the map
         component_size++; // increment the size of the colony
         row = currentElement.index.first; // get the row index of the current element
         col = currentElement.index.second; // get the column index of the current element
-        push_neigbors_to_stack(row, col, length, height, resource, map, dfsStack, expanded_nodes); // push the neighbors of the current element to the queue
-    }
-    for(int i = 0; i < length; i++){ // free the memory allocated for the visited nodes
-        delete[] expanded_nodes[i];
+        push_neigbors_to_stack(row, col, length, height, resource, map, dfsStack); // push the neighbors of the current element to the queue
     }
 
     return component_size; // return the size of the colony
@@ -189,35 +174,18 @@ int bfs(vector<vector<int>>& map, int row, int col, int resource) {
     queue <Node> bfsQueue; // create a queue to keep track of the elements to be visited, each element is a pair of the resource value and the pair of the row and column index
     int height = map[0].size(); // length of the row
     int length = map.size(); // length of the column
-    bool** expanded_nodes = new bool*[length]; // create a 2D array to keep track of visited nodes
-    // Declare memory block of size length
-	for (int i = 0; i < length; i++) {
-		// Declare a memory block of size height
-		expanded_nodes[i] = new bool[height];
-	}
-    for(int i = 0; i < length; i++){ // initialize the visited nodes to false
-        for(int j = 0; j < height; j++){
-            expanded_nodes[i][j] = false;
-        }
-    }
-
 
     bfsQueue.push(Node(map[row][col],pair<int,int>(row,col))); // push the first element to the queue
-    expanded_nodes[row][col] = true; // mark the first element as visited
+    map[row][col] = -1; // mark the first element as visited
 
     while(!bfsQueue.empty()){ // while the queue is not empty
         auto currentElement = bfsQueue.front(); // get the first element of the queue
         bfsQueue.pop(); // remove the first element from the queue
-        map[currentElement.index.first][currentElement.index.second] = -1; // change the value of the current element to -1 to find the largest colony in the map
         component_size++; // increment the size of the colony
         row = currentElement.index.first; // get the row index of the current element
         col = currentElement.index.second; // get the column index of the current element
-        push_neigbors_to_queue(row, col, length, height, resource, map, bfsQueue, expanded_nodes); // push the neighbors of the current element to the queue
+        push_neigbors_to_queue(row, col, length, height, resource, map, bfsQueue); // push the neighbors of the current element to the queue
     }
-    for(int i = 0; i < length; i++){ // free the memory allocated for the visited nodes
-        delete[] expanded_nodes[i];
-    }
-
     return component_size; // return the size of the colony
     /* END YOUR CODE HERE */
 
@@ -237,25 +205,26 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
     
     /* START YOUR CODE HERE */
     vector<pair<int,int>> largest_colonies(k); // initialize the size of the largest colony pair, first index is the size of the colony, second index is the resource type
-    for(int i = 0; i < 5; i++){
+    for(unsigned i = 0; i < k; i++){
         largest_colonies[i].first = 0; // initialize the size of the largest colony to 0
         largest_colonies[i].second = 0; // initialize the resource type of the largest colony to 0
     }
 
     // iterate through the map and find the largest colonies
     // in the bfs and dfs functions, I changed the value of the visited nodes to -1 to find the largest colony in the map, so that for connected components I don't have to deal with the same connected component multiple times
-    for(int i = 0; i < (int)map.size(); i++){
-        for(int j = 0; j < (int)map[i].size(); j++){
-            for(int k=1; k<=5; k++){
+    for(int i = 0; i < (int)map.size(); i++){  // iterate through the rows
+        for(int j = 0; j < (int)map[i].size(); j++){  // iterate through the columns
+            // I assumed that the resource types are between 1 and 5, k is not the number of resource type and I need that information
+            for(unsigned l=1; l<=5; l++){ // iterate through the resource types
                 int size=0;
                 if(useDFS == true)    
-                    size = dfs(map, i, j, k);
+                    size = dfs(map, i, j, l);
                 else 
-                    size = bfs(map, i, j, k);
+                    size = bfs(map, i, j, l);
                 sort(largest_colonies.begin(), largest_colonies.end(),greater<pair<int, int>>()); // sort the largest colonies in decreasing order according to their size
                 if(size > largest_colonies.back().first){ // if the size of the current colony is larger than the size of the smallest colony in the vector, update the element
                     largest_colonies.pop_back(); // remove the smallest colony from the vector
-                    largest_colonies.push_back(pair<int,int>(size,k)); // add the current colony to the vector
+                    largest_colonies.push_back(pair<int,int>(size,l)); // add the current colony to the vector
                 }
             }
         }
@@ -268,9 +237,9 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
 
     /* START YOUR CODE HERE */
 
-    // Sort the largest colonies in decreasing order
-    for(int i=0; i<k; i++){
-        for(int j=i+1; j<k; j++){
+    // Sort the largest colonies in decreasing order according to conditions written in the assignment
+    for(unsigned i=0; i<k; i++){
+        for(unsigned j=i+1; j<k; j++){
             if(largest_colonies[i].first < largest_colonies[j].first){ // sort the largest colonies in decreasing order according to their size
                 auto temp = largest_colonies[i]; // swap the largest colonies
                 largest_colonies[i] = largest_colonies[j];
@@ -294,10 +263,6 @@ vector<pair<int, int>> top_k_largest_colonies(vector<vector<int>>& map, bool use
 
 // Main function
 int main(int argc, char* argv[]) {
-    argc = 4;
-    argv[1] = "1";
-    argv[2] = "5";
-    argv[3] = "map4.txt";
     // Check the command line arguments
     if (argc != 4) {
 
