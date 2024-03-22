@@ -23,7 +23,6 @@
       - expect: "Colony 1: Size = 6, Resource Type = 2\r\n"
       - expect: "Colony 2: Size = 4, Resource Type = 1\r\n"
       - expect: _EOF_
-    
 
 - DFS_k=3_map3:
     run: ./main 1 4 map3.txt
@@ -110,4 +109,3 @@
       - expect: "Map: map5.txt\r\n"
       - expect: "No colonies found.\r\n"
       - expect: _EOF_
-    
