@@ -1,0 +1,366 @@
+/*
+	150180005	YaÄŸmur Ã‡aÄŸlar
+	
+	150180010	Elif ArÄ±kan
+	
+	150180059	Veysel Emre KÃ¶se
+*/
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---GATE IMPLEMENTATIONS--/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module nand_gate(i_1, i_2, o);
+    input wire i_1;
+    input wire i_2;
+
+    output wire o;
+
+    assign o = ~(i_1 & i_2);
+endmodule
+
+module nand3(i_1, i_2, i_3, o);
+    input wire i_1;
+    input wire i_2;
+    input wire i_3;
+
+    output wire o;
+
+    assign o = ~(i_1 & i_2 & i_3);
+endmodule
+
+module xor_gate(i_1, i_2, o);
+    input wire i_1;
+    input wire i_2;
+
+    output wire o;
+
+    assign o = i_1^i_2;
+endmodule
+
+module or_gate (i_1, i_2, o);
+	input wire i_1;
+	input wire i_2;
+	
+	output wire o;
+	
+	assign o = i_1 | i_2;
+endmodule
+
+module and_gate (i_1, i_2, o);
+	input wire i_1;
+	input wire i_2;
+	
+	output wire o;
+	
+	assign o = i_1 & i_2;
+endmodule
+
+module not_gate (i, o);
+	input wire i;
+	
+	output wire o;
+	
+	assign o = ~i;
+endmodule
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////-------Flip Flops--------/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+
+module d_flip_flop(
+	input d,
+	input clk,
+	input reset,
+	output q,
+	output qnot
+);
+	wire s,r, dre, dres;
+	nand3 nand1(reset,d,r,dre);
+	nand3 nand2(dre,clk,s,r);
+	nand3 nand3(reset,clk,dres,s);
+	nand_gate nand4(dre,s,dres);
+	
+	nand_gate nand5(s,qnot,q);
+	nand3 nand6(reset,r,q,qnot);
+endmodule
+
+
+module t_flip_flop(input t, input clk,input reset,  output q, output qnot);
+    wire d;
+	xor_gate XOR1(t,q,d);
+	d_flip_flop DFF1(d,clk, reset ,q,qnot);
+endmodule
+
+
+module jk_flip_flop(input j, input k,  input reset, input clk, output q, output qnot);
+    wire k_, jandqnot, k_andq, d;
+	not_gate NOT1(k,k_);
+	and_gate AND1(k_,q,k_andq);
+	and_gate AND2(j,qnot,jandqnot);
+	or_gate OR1(k_andq,jandqnot,d);
+	d_flip_flop DFF1(d,clk,reset,q,qnot);  
+endmodule
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////----------PART 1---------/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module part1(
+	input a,
+	input b,
+	input clk,
+	input reset,
+	output Z,
+	output q0,
+	output q1
+);
+	wire bnanda,aorb,j,k,t,x,q0not,q1not;
+	nand_gate NAND1(a,b,bnanda);
+	or_gate OR1(a,b,aorb);
+	
+	or_gate OR2 (bnanda,q0,j);
+	or_gate OR3 (bnanda,q1not,k);
+	and_gate AND1(aorb, q1not, t);
+	jk_flip_flop JK1(j,k,reset,clk,q0,q0not);
+	t_flip_flop TFF1(t,clk,reset,q1,q1not);
+	
+	and_gate AND2(bnanda, q0not, x);
+	or_gate OR4(x,q1not,Z);
+endmodule
+
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////----------PART 3---------/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+
+module upordown_counter(
+	data,
+    Clk,
+    clear, 
+	load, 
+	directon, // if is 1 c module increases, otherwise is 0 module decreases
+    In_Dec,  //increment or decrement value
+    Count
+    );
+
+    
+    //input ports and their sizes
+    input [15 : 0] data;
+    input Clk;
+    input clear;
+    input [2 : 0] In_Dec; 
+    input load;
+    input directon;
+    //output ports and their size
+    output reg [15 : 0] Count; 
+    
+     always @(posedge Clk)
+     begin
+        if(clear == 0) 
+            Count = 16'b0;
+        else
+			if(load==0)
+				Count <= data;
+			else
+				if(directon == 1)   //increment directon selected
+					if(Count == 65535)
+						Count <= 0;
+					else
+						Count <= Count + In_Dec; //Incremend Counter
+				else  //Decrement directon selected
+					if(Count == 0)
+						Count <= 65535;
+					else
+						Count <= Count - In_Dec; //Decrement counter
+     end    
+    
+endmodule
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////----------PART 4---------/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module part4_1(
+	data,
+    Clk,
+    clear,
+	load,
+	directon, // if is 1 c module increases, otherwise is 0 module decreases
+    In_Dec,  //increment or decrement value
+    Count
+    );
+
+    
+    //input ports and their sizes
+    input [15 : 0] data;
+    input Clk;
+    input clear;
+    input [2 : 0] In_Dec; 
+    input load;
+    input directon;
+    //output ports and their size
+    output reg [15 : 0] Count; 
+    
+     always @(posedge Clk)
+     begin
+        if(clear == 0) 
+            Count = 16'b0;
+        else
+			if(load==0)
+				Count <= data;
+			else
+				if(directon == 1)   //increment directon selected
+					if(Count == 16'd40)
+						Count <= 0;
+					else
+						Count <= Count + In_Dec; //Incremend Counter
+				else  //Decrement directon selected
+					if(Count == 16'd0)
+						Count <= 16'd40;
+					else
+						Count <= Count - In_Dec; //Decrement counter
+     end    
+    
+endmodule
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module part4_2(
+	data,
+    Clk,
+    clear,
+	load,
+	directon, // if is 1 c module increases, otherwise is 0 module decreases
+    In_Dec,  //increment or decrement value
+    Count
+    );
+
+    
+    //input ports and their sizes
+    input [15 : 0] data;
+    input Clk;
+    input clear;
+    input [2 : 0] In_Dec; 
+    input load;
+    input directon;
+    //output ports and their size
+    output reg [15 : 0] Count;
+    
+     always @(posedge Clk)
+     begin
+        if(clear == 0) 
+            Count = 16'd350;
+        else
+			if(load==0)
+				Count <= data;
+			else
+				if(directon == 1)   //increment directon selected
+					if(Count == 16'd371)
+						Count <= 16'd350;
+					else
+						Count <= Count + In_Dec; //Incremend Counter
+				else  //Decrement directon selected
+					if(Count == 16'd350)
+						Count <= 16'd371;
+					else
+						Count <= Count - In_Dec; //Decrement counter
+     end    
+    
+endmodule
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module part4_3(
+    data,
+    Clk,
+    clear,
+    load,
+    directon, // if is 1 c module increases, otherwise is 0 module decreases
+    In_Dec,  //increment or decrement value
+    Count
+    );
+
+
+    //input ports and their sizes
+    input [15 : 0] data;
+    input Clk;
+    input clear;
+    input [2 : 0] In_Dec; 
+    input load;
+    input directon;
+    //output ports and their size
+    output reg [15 : 0] Count;
+
+     always @(posedge Clk)
+     begin
+        if(clear == 0) 
+            Count = 16'd93;
+        else
+            if(load==0)
+                Count <= data;
+            else
+                if(directon == 1)   //increment directon selected
+                    if(Count == 16'd93)
+                        Count <= 0;
+                    else
+                        Count <= Count + In_Dec; //Incremend Counter
+                else  //Decrement directon selected
+                    if(Count == 16'd5)
+                        Count <= 16'd93;
+                    else
+                        Count <= Count - In_Dec; //Decrement counter
+     end
+
+endmodule
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module part4_4(
+    data,
+    Clk,
+    clear,
+    load,
+    directon, // if is 1 c module increases, otherwise is 0 module decreases
+    In_Dec,  //increment or decrement value
+    Count
+    );
+
+
+    //input ports and their sizes
+    input [15 : 0] data;
+    input Clk;
+    input clear;
+    input [2 : 0] In_Dec; 
+    input load;
+    input directon;
+    //output ports and their size
+    output reg [15 : 0] Count;
+
+     always @(posedge Clk)
+     begin
+        if(clear == 0) 
+            Count = 16'd22525;
+        else
+            if(load==0)
+                Count <= data;
+            else
+                if(directon == 1)   //increment directon selected
+                    if(Count == 16'd22535)
+                        Count <= 16'd22525;
+                    else
+                        Count <= Count + In_Dec; //Incremend Counter
+                else  //Decrement directon selected
+                    if(Count == 16'd5)
+                        Count <= 16'd93;
+                    else
+                        Count <= Count - In_Dec; //Decrement counter
+     end
+
+endmodule

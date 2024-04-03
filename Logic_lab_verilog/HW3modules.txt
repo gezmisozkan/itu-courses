@@ -1,0 +1,185 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 04/27/2023 07:05:43 PM
+// Design Name: 
+// Module Name: modules
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+module tri_buffer(
+    input I,
+    input E,
+    output O
+);    
+    assign O = (E == 1 ?  I : 1'bZ);
+endmodule
+
+module _8_bit_tri_buffer(
+    input [7:0]I,
+    input E,
+    output [7:0]O
+);    
+    assign O = (E == 1 ?  I : 8'bZ);
+endmodule
+
+//////////////   part1 ////////////////
+module part1(
+    input [7:0] data1,
+    input [7:0] data2,
+    input select,
+    output [7:0] Output
+);
+    _8_bit_tri_buffer buf1(.I(data1),.E(!select),.O(Output));
+    
+    _8_bit_tri_buffer buf2(.I(data2),.E(select),.O(Output));
+endmodule
+
+//////////////   part2 ////////////////
+module part2(
+    input [7:0] data1,
+    input [7:0] data2,
+    input select,
+    output [7:0] Output1,
+    output [7:0] Output2
+    );
+    wire [7:0] temp_data;
+    
+    part1 first_part1(data1,data2,select,temp_data);
+    
+    _8_bit_tri_buffer buf1(temp_data,!select,Output1);
+    
+    _8_bit_tri_buffer buf2(temp_data,select,Output2);
+endmodule
+
+//////////////   part3 ////////////////
+module part3(
+    input [7:0] Input ,
+    input reset,
+    input lineSelect,
+    input readEnable,
+    input writeEnable,
+    input clock,
+    output reg [7:0]out
+);
+    reg [7:0]S;
+    always@(negedge clock)
+    begin
+        if(reset)
+        begin
+            S <= 8'd0;
+            out <= 8'b0;
+        end
+    end
+    always@(posedge clock)
+    begin
+        if(writeEnable == 1 && lineSelect == 1)
+        begin
+            S <= Input;
+            out <= Input;
+        end
+        else if(readEnable == 1 && lineSelect == 1)
+        begin
+            out <= S;
+        end
+        else
+        begin
+            out <= 8'bZ;
+        end end 
+endmodule
+
+module part4(
+    input [7:0] Input ,
+    input [2:0] address,
+    input reset,
+    input chipSelect,
+    input readEnable,
+    input writeEnable,
+    input clock,
+    output [7:0] Output
+);
+    wire [7:0]decoded_address;
+    wire [7:0]final_chip_select;
+        reg [7:0] select;
+    always @* begin
+        if(chipSelect == 1) begin
+            case(address)
+                3'd0: select <= 8'b00000001;
+                3'd1: select <= 8'b00000010;
+                3'd2: select <= 8'b00000100;
+                3'd3: select <= 8'b00001000;
+                3'd4: select <= 8'b00010000;
+                3'd5: select <= 8'b00100000;
+                3'd6: select <= 8'b01000000;
+                3'd7: select <= 8'b10000000; 
+            endcase
+         end
+         else
+            select= 8'd0;
+    end
+    
+    part3 mem0(.Input(Input),.reset(reset),.lineSelect(select[0]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem1(.Input(Input),.reset(reset),.lineSelect(select[1]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem2(.Input(Input),.reset(reset),.lineSelect(select[2]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem3(.Input(Input),.reset(reset),.lineSelect(select[3]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem4(.Input(Input),.reset(reset),.lineSelect(select[4]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem5(.Input(Input),.reset(reset),.lineSelect(select[5]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem6(.Input(Input),.reset(reset),.lineSelect(select[6]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+    part3 mem7(.Input(Input),.reset(reset),.lineSelect(select[7]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.out(Output));
+
+endmodule
+
+module part5(
+    input [7:0] Input ,
+    input [4:0] address,
+    input reset,
+    input readEnable,
+    input writeEnable,
+    input clock,
+    output [7:0] Output
+);
+    reg [3:0]s;
+    always @* begin
+            case(address[4:3])
+                2'd0: s <= 4'b0001;
+                2'd1: s <= 4'b0010;
+                2'd2: s <= 4'b0100;
+                2'd3: s <= 4'b1000;
+            endcase
+    end    
+    part4 m0(.Input(Input),.address(address[2:0]),.reset(reset),.chipSelect(s[0]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(Output));
+    part4 m1(.Input(Input),.address(address[2:0]),.reset(reset),.chipSelect(s[1]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(Output));
+    part4 m2(.Input(Input),.address(address[2:0]),.reset(reset),.chipSelect(s[2]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(Output));
+    part4 m3(.Input(Input),.address(address[2:0]),.reset(reset),.chipSelect(s[3]),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(Output));
+endmodule
+
+module part6(
+    input [31:0] Input ,
+    input [4:0] address,
+    input reset,
+    input readEnable,
+    input writeEnable,
+    input clock,
+    output [31:0] Output
+);
+    wire [31:0] out;
+    
+    part5 m0(.Input(Input[31:24]),.address(address),.reset(reset),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(out[31:24]));
+    part5 m1(.Input(Input[23:16]),.address(address),.reset(reset),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(out[23:16]));
+    part5 m2(.Input(Input[15:8]),.address(address),.reset(reset),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(out[15:8]));
+    part5 m3(.Input(Input[7:0]),.address(address),.reset(reset),.readEnable(readEnable),.writeEnable(writeEnable),.clock(clock),.Output(out[7:0]));
+    assign Output = out;
+endmodule
+

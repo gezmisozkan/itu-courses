@@ -1,0 +1,185 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 03/29/2023 06:44:47 PM
+// Design Name: 
+// Module Name: modules
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+//NOT
+module not_gate(
+    input [0:0] x,
+    output O
+    );
+    assign O=~x;        
+endmodule
+
+//AND
+module and_gate(
+    input  x,
+    input  y,
+    output  O
+    );
+    assign O=x&y;
+endmodule
+
+//NAND
+module nand_gate(
+    input x,
+    input y,
+    output O
+    );
+    wire xy;
+    and_gate and1(.x(x),.y(y),.O(xy));
+    not_gate not1(.x(xy),.O(O));
+endmodule
+
+
+//OR
+module or_gate(
+    input  x,
+    input  y,
+    output O
+    );
+    assign O = x|y ;
+endmodule
+
+
+module SR_latch ( input S, input R, output Q, output Qneg);
+    wire Sneg,Rneg;
+     
+    nand_gate nand1(.x(S),.y(S),.O(Sneg)); // if we give same input the output will be it's complement
+    nand_gate nand2(.x(R),.y(R),.O(Rneg)); // if we give same input the output will be it's complement
+    
+    nand_gate nand3(.x(Sneg),.y(Qneg),.O(Q)); 
+    nand_gate nand4(.x(Rneg),.y(Q),.O(Qneg));
+   
+endmodule
+
+module SR_with_E (input S, input R, input E, output Q, output Qneg);
+    wire s, r;
+    nand_gate nand1(.x(E),.y(S),.O(s));
+    nand_gate nand2(.x(E),.y(R),.O(r));
+    
+    nand_gate nand3(.x(s),.y(Qneg),.O(Q));
+    nand_gate nand4(.x(r),.y(Q),.O(Qneg));
+endmodule
+
+module D_latch(input D, input E, output Q, output Qneg);
+    wire r,s1,r1;
+    nand_gate nand1(.x(D),.y(D),.O(r)); // if we give same input the output will be it's complement
+    
+    nand_gate nand2(.x(E),.y(D),.O(s1));
+    nand_gate nand3(.x(E),.y(r),.O(r1));
+    
+    nand_gate nand4(.x(s1),.y(Qneg),.O(Q));
+    nand_gate nand5(.x(r1),.y(Q),.O(Qneg));
+endmodule
+
+module d_flip_flop(input D,input clk,output Q,output Qneg);
+    wire Q1,q1;
+    reg l_clk;
+
+    D_latch d1(.D(D), .E(clk), .Q(Q1), .Qneg(q1));
+    D_latch d2(.D(Q1), .E(~clk), .Q(Q), .Qneg(Qneg));
+endmodule
+
+module jk_ff_nand(input J,input K,input clk,output Q,output Qneg);
+    
+    wire D,e1,e2,empty;
+    wire Qm,j1,k1;
+    assign e1=~clk;
+    assign e2=~e1;
+    
+    
+    nand_gate nand1(.x(J),.y(Qneg),.O(j1));
+    nand_gate nand2(.x(~K),.y(Q),.O(k1));
+    nand_gate nand3(.x(j1),.y(k1),.O(D));
+       
+    SR_with_E D1(.S(D),.R(~D),.E(e1),.Q(Qm),.Qneg(empty));
+    SR_with_E D2(.S(Qm),.R(~Qm),.E(clk),.Q(Q),.Qneg(Qneg));      
+endmodule
+
+
+module async_4_counter (input J,input K,input clk,input [3:0]Q,output [3:0]q);
+      
+    wire empty;
+    
+    
+    jk_ff_nand jk1(.J(J),.K(K),.clk(clk),  .Q(Q[0]),.Qneg(empty));
+    jk_ff_nand jk2(.J(J),.K(K),.clk(~Q[0]),.Q(Q[1]),.Qneg(empty));
+    jk_ff_nand jk3(.J(J),.K(K),.clk(~Q[1]),.Q(Q[2]),.Qneg(empty));
+    jk_ff_nand jk4(.J(J),.K(K),.clk(~Q[2]),.Q(Q[3]),.Qneg(empty));
+    
+    assign q[0]=Q[0];
+    assign q[1]=Q[1];
+    assign q[2]=Q[2];
+    assign q[3]=Q[3];
+        
+    
+endmodule 
+
+module sync_4_counter (input [3:0]Q,input clk,output [3:0]q);
+      
+    wire empty;
+    wire jk1,jk2,jk3,jk4;
+    assign jk1=1'b1;
+    
+    jk_ff_nand jkff1(.J(jk1),.K(jk1),.clk(clk),.Q(Q[0]),.Qneg(empty));
+    assign jk2=Q[0];
+    jk_ff_nand jkff2(.J(Q[0]),.K(Q[0]),.clk(clk),.Q(Q[1]),.Qneg(empty));
+    assign jk3=Q[0] & Q[1];
+    jk_ff_nand jkff3(.J(jk3),.K(jk3),.clk(clk),.Q(Q[2]),.Qneg(empty));
+    assign jk4=Q[2] & jk3;
+    jk_ff_nand jkff4(.J(jk4),.K(jk4),.clk(clk),.Q(Q[3]),.Qneg(empty));
+
+
+    assign q[0]=Q[0];
+    assign q[1]=Q[1];
+    assign q[2]=Q[2];
+    assign q[3]=Q[3];
+  
+
+endmodule 
+
+module counter_4 (input clk,input clear,output reg[3:0] out);    
+
+    always @ (posedge clk) begin  
+         if (clear)  
+            out <= 0;  
+         else  
+         out <= out + 1;  
+     end  
+endmodule  
+
+module part_7(input [15:0] inp,input wire clk,input wire flag,output reg O);
+
+    reg shift;
+    reg [15:0] load;
+
+    always @(posedge clk) begin
+        if(flag == 1) begin
+            load <= inp;
+            O <= inp[15];
+        end
+        else if (load == 0) begin
+            load <= {load[14:0],load[15]};
+            O <= load[14];
+        end
+   end
+endmodule
+
+

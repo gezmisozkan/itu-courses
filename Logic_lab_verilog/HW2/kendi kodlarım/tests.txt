@@ -1,0 +1,207 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 03/29/2023 07:17:07 PM
+// Design Name: 
+// Module Name: tests
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+/*
+module SR_test();
+	reg S, R;
+
+	wire Q, Qnot;
+	
+	SR_latch  test (.S(S), .R(R), .Q(Q), .Qneg(Qneg));
+	
+	initial begin
+		S=1; R=0; #200;
+		S=0; R=0; #200;
+		S=0; R=1; #200;
+		S=0; R=0; #200;
+		S=1; R=1; #200;
+	end
+endmodule
+*/
+/*
+module SR_with_E_test();
+	reg S, R,E;
+	wire Q, Qneg;
+	
+	SR_with_E  test(.S(S), .R(R), .E(E), .Q(Q), .Qneg(Qneg));
+	
+	initial begin
+		S=0; E=0; R=0; #200;
+		S=1; E=1; R=0; #200;
+		S=0; E=1; R=0; #200;
+		S=0; E=1; R=1; #200;
+		S=0; E=1; R=0; #200;
+		S=1; E=1; R=1; #200; //forbidden
+	end
+endmodule
+*/
+/*
+module d_latch_test();
+	reg D,E;
+	wire Q, Qneg;
+	
+	D_latch  test(.D(D), .E(E), .Q(Q), .Qneg(Qneg));
+	
+	initial begin
+		D=0; E=0; #125;
+		D=0; E=1; #125;
+		D=1; E=0; #125;
+		D=1; E=1; #125;
+		D=0; E=0; #125;
+		D=0; E=1; #125;
+		D=1; E=0; #125;
+		D=1; E=1; #125;
+	end
+endmodule
+*/
+/*
+module jk_ff_nand_test();
+	reg J,K,clk;
+	wire Q,Qneg;
+	
+	jk_ff_nand  test(.J(J), .K(K),.clk(clk),.Q(Q),.Qneg(Qneg));
+	initial begin
+	      J=0; K=1; clk=0; #100;
+		J=0; K=1; clk=1; #100;
+		J=0; K=0; clk=0; #100;
+		J=0; K=0; clk=1; #100;
+		
+		
+		J=1; K=0; clk=1; #100;
+		J=1; K=0; clk=0; #100;
+		J=1; K=0; clk=1; #100;
+		J=1; K=1; clk=1; #100;
+		
+		J=1; K=1; clk=0; #100;
+		J=0; K=1; clk=0; #100;
+		J=0; K=1; clk=1; #100;
+		J=1; K=0; clk=1; #100;
+		
+		J=0; K=0; clk=1; #100;
+
+	end
+endmodule
+*/
+
+/*
+//It is not working well
+module counter_async();
+    reg clk;
+    reg [3:0] Q;
+    reg J,K;
+    wire [3:0]o1;
+    async_4_counter test(.J(J),.K(K),.clk(clk),.Q(Q),.q(o1));
+    initial begin
+       Q=4'd0; clk=0; #40; 
+       J=0; K=1; clk=1; #20;    J=1; K=0; clk=1; #20;   J=1; K=1; clk=1; #20;
+       J=0; K=1; clk=1; #20;    J=1; K=0; clk=1; #20;   J=1; K=1; clk=1; #20;
+       J=0; K=1; clk=1; #20;    J=1; K=0; clk=1; #20;   J=1; K=1; clk=1; #20;
+       J=0; K=1; clk=1; #20;    J=1; K=0; clk=1; #20;   J=1; K=1; clk=1; #20;       
+       
+       
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+       J=1; K=1; clk=0; #25;   J=1; K=1; clk=1; #25;
+     end 
+    
+endmodule
+
+*/
+/*
+//It is not working well
+module counter_sync();
+    reg clk;
+    reg [3:0] Q;
+    wire [3:0]o1;
+    sync_4_counter test(.Q(Q),.clk(clk),.q(o1));
+    initial begin
+        Q[0]=0; Q[1]=0; Q[2]=0; Q[3]=0; clk=0; #40; 
+        clk=~clk; #30;   
+        clk=~clk; #30;
+        clk=~clk; #30;
+        clk=~clk; #30;
+        clk=~clk; #30;
+        clk=~clk; #30;
+        clk=~clk; #30;
+        clk=~clk; #30;
+    
+    end 
+    
+endmodule
+*/
+
+module counter_test;  
+    reg clk;
+    reg clear;
+    wire [3:0] out;
+    
+    counter_4 test(.clk(clk),.clear (clear),.out(out));  
+      
+    always #5 clk = ~clk;  
+  
+  initial begin  
+    clk <= 0;  
+    clear <= 1;  
+    
+    clear=0; #20;
+    clear=0; #180;
+    clear=1; #50;
+    clear=0; #100;
+  end  
+endmodule 
+/*
+module part_7_test();
+
+reg [15:0] i;
+reg clk;
+reg flag;
+wire O;
+
+part_7 uut(.inp(i), .clk(clk), .flag(flag), .O(O));
+
+     initial begin
+     clk = 0; i = 16'd48; flag = 1; #50
+         i=16'b1011000101111000; flag = 0; #256;
+         i=16'b1001111100101010; flag = 0; #256;
+         i=16'b1110001010101011; flag = 0; #256;
+         i=16'b0101111010100000; flag = 0; #256;
+         i=16'b0000111010111000; flag = 1; #256;
+         i=16'b1111011110111101; flag = 1; #256;
+         i=16'b0000000101011100; flag = 0; #256;
+         i=16'b1111100010110000; flag = 0; #256;
+         i=16'b0011100001111111; flag = 1; #256;
+         i=16'b1010101010101010; flag = 1; #256;
+         i=16'b0010010011101011; flag = 1; #256;
+         i=16'b1111000010100001; flag = 0; #256;
+         i=16'b1100000000000011; flag = 0; #256;
+         i=16'b1000000000000101; flag = 1; #256;
+         i=16'b0000000000010010; flag = 0; #256;
+     end
+
+    always begin
+        clk <= ~clk; #10;
+        clk <= ~clk; #22;
+    end
+endmodule
+*/

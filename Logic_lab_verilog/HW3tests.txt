@@ -1,0 +1,84 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 04/27/2023 07:18:38 PM
+// Design Name: 
+// Module Name: tests
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+//////////////   part1 simulation////////////////
+module part1_simulation(); 
+    reg [7:0] data1;
+    reg [7:0] data2;
+    reg select;
+    wire [7:0] Output;
+    part1 test(.data1(data1),.data2(data2),.select(select),.Output(Output));
+    initial begin
+        data1 = 8'd6;    data2 = 8'd5;   select = 0; #100;
+        data1 = 8'd3;    data2 = 8'd9;   select = 1; #100;
+        data1 = 8'd74;   data2 = 8'd25;  select = 1; #100;
+        data1 = 8'd12;   data2 = 8'd19;  select = 0; #100;
+        data1 = 8'd62;   data2 = 8'd95;  select = 1; #100;
+    end
+endmodule
+
+//////////////   part2 simulation ////////////////
+module part2_simulation(); 
+    reg [7:0] data1;
+    reg [7:0] data2;
+    reg select;
+    wire [7:0] Output1;
+    wire [7:0] Output2;
+    part2 test(data1,data2,select,Output1,Output2);  
+    initial begin
+        data1 = 8'd6;    data2 = 8'd5;   select = 0; #100;
+        data1 = 8'd3;    data2 = 8'd9;   select = 1; #100;
+        data1 = 8'd74;   data2 = 8'd25;  select = 1; #100;
+        data1 = 8'd12;   data2 = 8'd19;  select = 0; #100;
+        data1 = 8'd62;   data2 = 8'd95;  select = 1; #100;
+    end
+endmodule
+
+
+//////////////   part3 simulation ////////////////
+module part3_simulation();
+    reg [7:0] Input;
+    reg reset;
+    reg lineSelect;
+    reg readEnable;
+    reg writeEnable;
+    reg clock;
+    wire [7:0] Output;
+    part3 test(Input, reset, lineSelect, readEnable, writeEnable, clock, Output);
+
+    always #50 clock = ~clock;
+    
+    initial begin
+         clock = 0;   
+         Input = 8'b00000000;  reset = 1; lineSelect = 1;   readEnable = 0; writeEnable = 1;     #100;
+         Input = 8'b00000010;  reset = 1; lineSelect = 1;   readEnable = 1; writeEnable = 0;     #100;
+         Input = 8'b10100101;  reset = 0; lineSelect = 1;   readEnable = 1; writeEnable = 1;     #100;
+         Input = 8'b00110101;  reset = 0; lineSelect = 0;   readEnable = 1; writeEnable = 0;     #100;
+         Input = 8'b00110001;  reset = 1; lineSelect = 1;   readEnable = 1; writeEnable = 1;     #100;
+         Input = 8'b00110001;  reset = 0; lineSelect = 1;   readEnable = 1; writeEnable = 0;     #100;
+         Input = 8'b01011001;  reset = 0; lineSelect = 1;   readEnable = 1; writeEnable = 1;     #100;
+         Input = 8'b00100100;  reset = 1; lineSelect = 1;   readEnable = 1; writeEnable = 0;     #100;
+    end
+
+
+endmodule
+
+

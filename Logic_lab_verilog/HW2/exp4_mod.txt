@@ -1,0 +1,35 @@
+module nand_gate(i_1, i_2, o);
+    input wire i_1;
+    input wire i_2;
+
+    output wire o;
+
+    assign o = ~(i_1 & i_2);
+endmodule
+
+module SR ( input S, input R, output Q, output Qnot);
+    nand_gate NAND1(Q,R,Qnot);
+    nand_gate NAND2(Qnot,S,Q);
+endmodule
+
+module SR_E (input S, input R, input E, output Q, output Qnot);
+    wire s1, r1;
+    nand_gate NAND1(S,E,s1);
+    nand_gate NAND2(R,E,r1);
+    nand_gate NAND3(Q,r1,Qnot);
+    nand_gate NAND4(Qnot,s1,Q);
+endmodule
+
+module d_flip_flop(input D, input Clk, output Q, output Qnot);
+    wire s1, temp;
+    d_latch(D, ~Clk, s1, temp);
+    d_latch(s1, Clk, Q, Qnot);
+endmodule 
+
+module d_latch(input D, input Clk, output Q, output Qnot);
+    wire s1,r1;
+    nand_gate NAND1(D, Clk, s1);
+    nand_gate NAND2(~D, Clk, r1);
+    nand_gate NAND3(s1,Qnot, Q),
+    nand_gate NAND4(r1,Q, Qnot);
+endmodule

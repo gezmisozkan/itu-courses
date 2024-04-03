@@ -1,0 +1,92 @@
+/*
+	150180005	YaÄŸmur Ã‡aÄŸlar
+	
+	150180010	Elif ArÄ±kan
+	
+	150180059	Veysel Emre KÃ¶se
+*/
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---GATE IMPLEMENTATIONS--/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+module nand_gate(i_1, i_2, o);
+    input wire i_1;
+    input wire i_2;
+
+    output wire o;
+
+    assign o = ~(i_1 & i_2);
+endmodule
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---PART 1 IMPLEMENTATION-/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module SR ( input S, input R, output Q, output Qnot);
+    wire snot,rnot;
+   
+    nand_gate NAND1(S,S,snot);
+    nand_gate NAND2(R,R,rnot);
+    nand_gate NAND3(Q,rnot,Qnot);
+    nand_gate NAND4(Qnot,snot,Q);
+endmodule
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---PART 2 IMPLEMENTATION-/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module SR_E (input S, input R, input E, output Q, output Qnot);
+    wire s1, r1;
+    nand_gate NAND1(S,E,s1);
+    nand_gate NAND2(R,E,r1);
+    nand_gate NAND3(Q,r1,Qnot);
+    nand_gate NAND4(Qnot,s1,Q);
+endmodule
+
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---PART 3 IMPLEMENTATION-/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module d_latch(input D, input Clk, output Q, output Qnot);
+    wire s1,r1;
+    nand_gate NAND1(D, Clk, s1);
+    nand_gate NAND2(~D, Clk, r1);
+    nand_gate NAND3(s1,Qnot, Q);
+    nand_gate NAND4(r1,Q, Qnot);
+endmodule
+
+module d_flip_flop(input D, input Clk, output Q, output Qnot);
+    wire s1, temp;
+    d_latch DLATCH1(D, ~Clk, s1, temp);
+    d_latch DLATCH2(s1, Clk, Q, Qnot);
+endmodule 
+
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+//////////////////////////////////////////////---PART 4 IMPLEMENTATION-/////////////////////////////////////////////
+//////////////////////////////////////////////-------------------------/////////////////////////////////////////////
+
+module shifreg(input [15:0] yildik, input clk, input load, output Q);
+       wire [15:0] sel;
+       wire [15:0] ara;
+       d_flip_flop d0(.D(sel[0]), .Clk(clk), .Q(ara[1]));
+       d_flip_flop d1(.D(sel[1]), .Clk(clk), .Q(ara[2]));
+       d_flip_flop d2(.D(sel[2]), .Clk(clk), .Q(ara[3]));
+       d_flip_flop d3(.D(sel[3]), .Clk(clk), .Q(ara[4]));
+       d_flip_flop d4(.D(sel[4]), .Clk(clk), .Q(ara[5]));
+       d_flip_flop d5(.D(sel[5]), .Clk(clk), .Q(ara[6]));
+       d_flip_flop d6(.D(sel[6]), .Clk(clk), .Q(ara[7]));
+       d_flip_flop d7(.D(sel[7]), .Clk(clk), .Q(ara[8]));
+       d_flip_flop d8(.D(sel[8]), .Clk(clk), .Q(ara[9]));
+       d_flip_flop d9(.D(sel[9]), .Clk(clk), .Q(ara[10]));
+       d_flip_flop d10(.D(sel[10]), .Clk(clk), .Q(ara[11]));
+       d_flip_flop d11(.D(sel[11]), .Clk(clk), .Q(ara[12]));
+       d_flip_flop d12(.D(sel[12]), .Clk(clk), .Q(ara[13]));
+       d_flip_flop d13(.D(sel[13]), .Clk(clk), .Q(ara[14]));
+       d_flip_flop d14(.D(sel[14]), .Clk(clk), .Q(ara[15]));
+       d_flip_flop d15(.D(sel[15]), .Clk(clk), .Q(ara[0]));
+       
+       assign sel=load==1?yildik:ara;
+       assign Q=ara[0];
+endmodule
