@@ -25,9 +25,9 @@ struct Point {
 
 // Helper function to calculate distance between two points
 double distance(Point p1, Point p2) {
-    int x_diff = p1.x - p2.x;
-    int y_diff = p1.y - p2.y;
-    int dist = x_diff * x_diff + y_diff * y_diff;
+    double x_diff = fabs(p1.x - p2.x);
+    double y_diff = fabs(p1.y - p2.y);
+    long double dist = x_diff * x_diff + y_diff * y_diff;
     return sqrt(dist);
     //YOUR CODE HERE
 }
@@ -51,7 +51,7 @@ pair<Point, Point> bruteForceClosestPair(vector<Point>& points, int start, int e
     double min_distance = 1e10;  // set the initial minimum distance as a very large number
     pair<Point, Point> min_pair;  // set the initial minimum pair as an empty pair
     for(int i = start; i < end; i++){
-        for(int j = i+1; j < end; j++){
+        for(int j = i+1; j <= end; j++){
             double dist = distance(points[i], points[j]);
             if(dist < min_distance){
                 min_distance = dist;
@@ -59,7 +59,23 @@ pair<Point, Point> bruteForceClosestPair(vector<Point>& points, int start, int e
             }
         }
     }
-    return min_pair;
+    pair<Point,Point> sorted_pair;  // set the sorted pair
+    if(min_pair.first.y < min_pair.second.y){  // if the y coordinate of the first point is smaller than the y coordinate of the second point
+        sorted_pair = min_pair;  // return the pair
+    }
+    else if(min_pair.first.y == min_pair.second.y){  // if the y coordinatesare the same
+        if(min_pair.first.x < min_pair.second.x){  // if the x coordinate of the first point is smaller than the x coordinate of the second point
+            sorted_pair = min_pair;  // return the pair
+        }
+        else{  // if the x coordinate of the first point is greater than the x coordinate of the second point
+            sorted_pair = pair<Point,Point>(min_pair.second, min_pair.first);  // return the pair with the first point as the second point and the second point as the first point
+        }
+    }
+    else{  // if the y coordinate of the first point is greater than the y coordinate of the second point
+        sorted_pair = pair<Point,Point>(min_pair.second, min_pair.first);  // return the pair with the first point as the second point and the second point as the first point
+    }
+
+    return sorted_pair;
     //YOUR CODE HERE
 }
 
@@ -102,9 +118,10 @@ pair<Point, Point> closestPair(vector<Point>& points, int start, int end) {
 
     int max_check_num = 8; // set the maximum number of points to check as 8 for upper and below points
     double min_distance = min_dist;  // set the initial minimum distance as the minimum distance between the closest pairs of points in the left and right sides of the vector
-    for(int i=0;i<y_sorted.size();i++){  // for each point in the strip
+    int size= y_sorted.size();  // find the size of the strip
+    for(int i=0;i<size;i++){  // for each point in the strip
         for(int j=1 ;j<=max_check_num;j++){  // check the upper points
-            if(i+j < y_sorted.size()){  // if the point is in the vector
+            if(i+j < size){  // if the point is in the vector
                 double dist = distance(y_sorted[i], y_sorted[i+j]);  // find the distance between the points
                 if(dist < min_distance){
                     min_distance = dist;
@@ -151,16 +168,24 @@ pair<Point, Point> closestPair(vector<Point>& points, int start, int end) {
 // Function to remove a pair of points from the point vector. Returns the newly formed vector.
 vector<Point> removePairFromVector(vector<Point>& point_vector, pair<Point,Point> point_pair) {  // remove the pair from the vector
     int position1 = 0, position2 = 0;  // set the initial positions as 0
-    for(int i = 0; i < point_vector.size(); i++){  // find the positions of the points in the vector
+    int size = point_vector.size();  // find the size of the vector
+    for(int i = 0; i < size; i++){  // find the positions of the points in the vector
         if(point_vector[i].x == point_pair.first.x && point_vector[i].y == point_pair.first.y){  // if the first point is found, set the position1 as i
             position1 = i;
-        }
-        if(point_vector[i].x == point_pair.second.x && point_vector[i].y == point_pair.second.y){  // if the second point is found, set the position2 as i
-            position2 = i;
+            break; 
         }
     }
     point_vector.erase(point_vector.begin() + position1);  // erase the first point from the vector
-    point_vector.erase(point_vector.begin() + position2-1);  // erase the second point from the vector, since the first point is already erased, the position of the second point is decreased by 1
+    
+    size = point_vector.size();  // find the size of the vector
+    for(int i = 0; i < size; i++){  // find the positions of the points in the vector
+        if(point_vector[i].x == point_pair.second.x && point_vector[i].y == point_pair.second.y){  // if the first point is found, set the position1 as i
+            position2 = i;
+            break;
+        }
+    }
+    point_vector.erase(point_vector.begin() + position2);  // erase the second point from the vector
+   
     return point_vector;
     //YOUR CODE HERE
 
@@ -178,12 +203,12 @@ void findClosestPairOrder(vector<Point> points) {
 
     //YOUR CODE HERE
 
-    bool brute_force = false;  // if brute force is selected, set the boolean as true
+    bool brute_force = true;  // if brute force is selected, set the boolean as true
     // brute force part
     if(brute_force){  // if brute force is selected
-        sort(points.begin(), points.end(), compareY);  // first sort the array according to y coordinates
+        sort(points.begin(), points.end(), compareX);  // first sort the array according to y coordinates
         while (points.size() >= 2){  // while there are at least 2 points in the vector
-            pair<Point, Point> closest_pair = bruteForceClosestPair(points, 0, points.size());  // find the closest pair of points
+            pair<Point, Point> closest_pair = bruteForceClosestPair(points, 0, points.size()-1);  // find the closest pair of points
             pairs.push_back(closest_pair);  // add the pair to the pairs vector
             points = removePairFromVector(points, closest_pair);  // remove the pair from the vector
         }
@@ -197,7 +222,7 @@ void findClosestPairOrder(vector<Point> points) {
     if(!brute_force){  // if divide and conquer is selected
         sort(points.begin(), points.end(), compareX);  // first sort the array according to x coordinates
         while (points.size() >= 2){  // while there are at least 2 points in the vector
-            pair<Point, Point> closest_pair = closestPair(points, 0, points.size());  // find the closest pair of points using divide and conquer
+            pair<Point, Point> closest_pair = closestPair(points, 0, points.size()-1);  // find the closest pair of points using divide and conquer
             pairs.push_back(closest_pair);  // add the pair to the pairs vector
             points = removePairFromVector(points, closest_pair);  // remove the pair from the vector
         }
@@ -225,7 +250,10 @@ void findClosestPairOrder(vector<Point> points) {
 //Read the coordinates from the file and convert them to a vector. Return the vector as a "vector<Point>"
 vector<Point> readCoordinatesFromFile(const string& filename) {
     vector<Point> points;
-    
+    if(filename.empty()){
+        cerr << "Filename is empty!"<<endl;
+        exit(1);
+    }
     ifstream file(filename);
     if (!file.is_open()) {
         cerr << "File cannot be opened!"<<endl;
@@ -245,7 +273,7 @@ vector<Point> readCoordinatesFromFile(const string& filename) {
 
 // Main function. Ideally, you don't need to modify this.
 int main(int argc, char* argv[]) {
-    // argv[1] = "case0.txt";
+    argv[1] = "case4.txt";
     vector<Point> points = readCoordinatesFromFile(argv[1]);
     findClosestPairOrder(points);
     return 0;
