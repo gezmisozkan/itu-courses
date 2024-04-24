@@ -1,0 +1,6 @@
+setup.py
+ai_assignments.egg-info/PKG-INFO
+ai_assignments.egg-info/SOURCES.txt
+ai_assignments.egg-info/dependency_links.txt
+ai_assignments.egg-info/requires.txt
+ai_assignments.egg-info/top_level.txt

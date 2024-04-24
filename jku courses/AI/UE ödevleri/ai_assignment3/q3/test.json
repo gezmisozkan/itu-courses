@@ -1,0 +1,1 @@
+{"type": "Gridworld", "seed": 330263941, "dones": [[false, false, false], [false, true, false], [false, false, true]], "rewards": [[-1, -1, -1], [-1, -100, -1], [-1, -1, 100]], "starts": [[1, 0]]}
