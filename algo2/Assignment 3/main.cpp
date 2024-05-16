@@ -47,7 +47,7 @@ struct TimeIntervals {
 struct Item {
     string name;  
     int weight;  // Price of the item
-    double value;
+    double value;  // Value of the item
 
     Item(string name, int weight, double value){  // Constructor
         this->name = name;
