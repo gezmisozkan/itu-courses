@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 #define INITIAL_CAPACITY 1
 
@@ -74,39 +75,126 @@ Matrix readMatrixFromFile(char* filename) {
     return result;
 }
 
+int* bankersAlgorithm(Matrix allocations, Matrix requests, int* available) {
+    int process_count = allocations.rows; // Number of processes
+    int resource_count = allocations.cols; // Number of resources
+
+    bool finish[process_count];  // Array to store the finish status of each process
+
+    // Initialize the finish array
+    for (int i = 0; i < process_count; i++) {  // Initially all processes are not finished
+        finish[i] = false;
+    }
+    
+    int* order = malloc(process_count * sizeof(int));  // Array to store the order of the processes
+    for(int i=0; i<process_count; i++){
+        order[i] = -1;  // Initialize the order array with -1
+    }
+    int index = 0; // Index for the order array
+    
+    // Banker's algorithm
+    for (int i = 0; i < process_count; i++) {  // Iterate over all processes
+        for (int j = 0; j < process_count; j++) {  // Double loop to iterate over all processes, since after releasing resources, the available resources may be enough for a process that was not able to run before
+            if (finish[j] == false) {  // If the process is not finished
+                bool flag = true;
+                for (int k = 0; k < resource_count; k++) {  // Iterate over all resources
+                    if (requests.matrix[j][k] > available[k]) {  // If the process needs more resources than available
+                        flag = false;  // Set the flag to false and break the loop
+                        break;
+                    }
+                }
+
+                if (flag == true) {  // If the process can run
+                    finish[j] = true;  // Set the process as finished
+                    order[index++] = j; // Add the process to the order array
+                    for (int k = 0; k < resource_count; k++) {  // Iterate over all resources
+                        available[k] += allocations.matrix[j][k];  // Release the resources
+                        allocations.matrix[j][k] = 0;  // Set the allocated resources to 0
+                    }
+                }
+            }
+        }
+    }
+
+    // Print the order of the processes
+    printf("Running order for processes: ");
+    for (int i = 0; i < allocations.rows, order[i] != -1; i++) {  // If the order[i] is -1, then there is a deadlock
+        printf("P%d ", order[i] + 1);  // order[i] + 1 because the process number starts from 1
+    }
+    printf("\n");
+
+    // Check if all processes have finished, if not then there is a deadlock
+    bool deadlock = false;  // Flag to check if there is a deadlock
+    for (int i = 0; i < process_count; i++) {  // Iterate over all processes
+        if (finish[i] == false) {  // If the process is not finished
+            if (!deadlock) {  // This is the print statement for the first process that is not finished
+                printf("There is a deadlock. Processes that are the cause of the deadlock: ");
+                deadlock = true;  // Set the deadlock flag to true
+            }
+            printf("P%d ", i+1);  // Print the process number
+        }
+    }
+    if (deadlock) {  // If there is a deadlock, print a new line
+        printf("\n");
+        return NULL;  // Return NULL to indicate that there is a deadlock
+    }
+
+    return order;
+}
 int main(){
-    char* allocation_file = "allocations.txt";
+    char* allocation_file = "allocations.txt";  // Define the file names
     char* resource_file = "resources.txt";
-    char* request_file = "requests.txt";
+    char* request_file = "requests.txt";  
 
-    Matrix allocations = readMatrixFromFile(allocation_file);
-    Matrix resources = readMatrixFromFile(resource_file);
-    Matrix requests = readMatrixFromFile(request_file);
+    Matrix allocations = readMatrixFromFile(allocation_file);  // Read the allocations matrix from the file, it stores with malloc so we need to free it
+    Matrix resources = readMatrixFromFile(resource_file);  // Read the resources matrix from the file, it stores with malloc so we need to free it
+    Matrix requests = readMatrixFromFile(request_file);  // Read the requests matrix from the file, it stores with malloc so we need to free it
+    // The requests matrix is the need matrix, it shows the resources that each process needs
 
-    // print the allocations matrix
-    printf("Allocations matrix:\n");
+    int available[resources.cols];  // Initialize an array to store the available resources
+
+    // Calculate the available resources
+    for(int i=0; i<allocations.cols; i++){  // Since the number of columns in allocations is the number of resources
+        int sum = 0;
+        for(int j=0; j<allocations.rows; j++){  // Since the number of rows in allocations is the number of processes
+            sum += allocations.matrix[j][i];  // Sum the allocated resources for each process
+        }
+        available[i] = resources.matrix[0][i] - sum;
+    }
+
+    // Print information of processes
+    for (int i=0; i<allocations.rows; i++){  // Since the number of rows in allocations is the number of processes
+        printf("Information for process P%d:\n", i+1);  // i+1 because the process number starts from 1
+        printf("Allocated resources: ");
+        for (int j=0; j<allocations.cols; j++){  // Since the number of columns in allocations is the number of resources
+            printf("R%d:%d ", j+1, allocations.matrix[i][j]);
+        }
+        printf("\n");
+        printf("Resource request:    ");
+        for(int j=0; j<resources.cols; j++){  // Since the number of columns in resources is the number of resources
+            printf("R%d:%d ", j+1, requests.matrix[i][j]);
+        }
+        printf("\n\n");
+    }
+
+    // Run the Banker's algorithm
+    bankersAlgorithm(allocations, requests, available);
+
+    // Free the memory allocated for the aloocations, resources, and requests matrices
     for (int i = 0; i < allocations.rows; i++) {
-        for (int j = 0; j < allocations.cols; j++) {
-            printf("%d ", allocations.matrix[i][j]);
-        }
-        printf("\n");
+        free(allocations.matrix[i]);
     }
-    //print resources matrix
-    printf("Resources matrix:\n");
+    free(allocations.matrix);  
+
     for (int i = 0; i < resources.rows; i++) {
-        for (int j = 0; j < resources.cols; j++) {
-            printf("%d ", resources.matrix[i][j]);
-        }
-        printf("\n");
+        free(resources.matrix[i]);
     }
-    //print requests matrix
-    printf("Requests matrix:\n");
+    free(resources.matrix);
+
     for (int i = 0; i < requests.rows; i++) {
-        for (int j = 0; j < requests.cols; j++) {
-            printf("%d ", requests.matrix[i][j]);
-        }
-        printf("\n");
+        free(requests.matrix[i]);
     }
+    free(requests.matrix);
 
     return 0;
 }
